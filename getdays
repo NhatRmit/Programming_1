@@ -1,0 +1,23 @@
+ public static void main(String[] args) {
+    LocalDate startDate = dateInput("12/1/2020");
+    LocalDate endDate = dateInput("12/31/2020");
+
+    List<LocalDate> listOfDates = startDate.datesUntil(endDate.plusDays(1)).collect(Collectors.toList());
+    
+    // format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+    LocalDate[] time = new LocalDate[listOfDates.size()];  
+    time = listOfDates.toArray(time);
+    String[] time_format = new String[time.length];
+    for(LocalDate t : time) {
+      String format = t.format(DateTimeFormatter.ofPattern("MM/d/yyyy"));
+      System.out.println(format);
+    }
+
+    
+
+  }
+  public static LocalDate dateInput(String userInput) {
+    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("M/d/yyyy");
+    LocalDate date = LocalDate.parse(userInput, dateFormat);
+    return date;
+}
