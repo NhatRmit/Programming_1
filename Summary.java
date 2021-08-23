@@ -6,19 +6,17 @@ public class Summary {
     int num_of_group, daysInput;
     String path = "java/src/covid-data.csv";
     String line = "";
-    String userMetric = "";
+    String userMetricChoice = "";
     Scanner sc = new Scanner(System.in);
     ArrayList<String> list = new ArrayList<>();
-    ArrayList<String> subList = new ArrayList<>();
-    ArrayList<String> subListBeforeRange = new ArrayList<>();
-    ArrayList<String> subMetric = new ArrayList<>();
-    ArrayList<String> userList = new ArrayList<>();
-    ArrayList<String> metric = new ArrayList<>();
+    ArrayList<String> listByArea = new ArrayList<>();
+    ArrayList<String> listFromBeginToStartDate = new ArrayList<>();
+    ArrayList<String> listByAreaMetric = new ArrayList<>();
+    ArrayList<String> listUserRangeTime = new ArrayList<>();
+    ArrayList<String> listUserMetric = new ArrayList<>();
     ArrayList<Integer> newtotal = new ArrayList<>();
     ArrayList<Integer> upto = new ArrayList<>();
     List<List<String>> dataList = new ArrayList<>();
-
-    String[] userData;
     Data user = new Data();
 
     public void summary() throws Exception, FileNotFoundException {
@@ -33,28 +31,26 @@ public class Summary {
         while ((line = br.readLine()) != null) {
             list.add(line);
         }
-
         for (String e : list) {
             if (isContain(e, user.area) == true) {
-                subList.add(e);
+                listByArea.add(e);
             }
         }
-
-        for (String e : subList) {
+        for (String e : listByArea) {
             if (isContain(e, user.range[0]) != true) {
-                subListBeforeRange.add(e);
+                listFromBeginToStartDate.add(e);
             } else {
                 break;
             }
         }
-
-        for (String e : subList) {
+        for (String e : listByArea) {
             for (int i = 0; i < user.range.length; i++) {
                 if (isContain(e, user.range[i]) == true) {
-                    userList.add(e);
+                    listUserRangeTime.add(e);
                 }
             }
         }
+        br.close();
     }
 
     public void convertToArray(ArrayList<String> list, ArrayList<String> metric) {
@@ -62,22 +58,18 @@ public class Summary {
         String[] userListConvert = new String[list.size()];
         userListConvert = list.toArray(userListConvert);
         String[] value;
-
         // get each index
         for (String s : userListConvert) {
             value = s.split(",");
-            switch (this.userMetric) {
+            switch (this.userMetricChoice) {
                 case "cases":
-                    metric.add(value[4]);
+                    this.listUserMetric.add(value[4]);
                     break;
                 case "deaths":
-                    metric.add(value[5]);
+                    this.listUserMetric.add(value[5]);
                     break;
                 case "vaccinations":
-                    metric.add(value[6]);
-                    break;
-                default:
-                    annInvalid();
+                    this.listUserMetric.add(value[6]);
                     break;
             }
         }
@@ -90,20 +82,39 @@ public class Summary {
                 1. No Grouping
                 2. Number of Groups
                 3. Number of Days in a group""");
-
         opt = sc.nextInt();
+        boolean check = true;
         switch (opt) {
             case 1:
                 inputMetric(opt);
                 break;
-            case 2:
+            case 2:   
                 System.out.println("Please choose number of group that you want: ");
                 this.num_of_group = sc.nextInt();
+                while(check) {
+                    if ((this.num_of_group >= 2 && this.num_of_group < 80) && (this.num_of_group <= listUserRangeTime.size())) {
+                        check = false;
+                    }  else {
+                        annInvalid();
+                        System.out.println("Please choose number of group that you want: ");
+                        this.num_of_group = sc.nextInt();
+                        check = true;
+                    }
+                }
                 inputMetric(opt);
                 break;
             case 3:
                 System.out.println("Enter your number of days: ");
                 this.daysInput = sc.nextInt();
+                while(check){
+                    if(checkDivisible(this.daysInput) != true){
+                        annInvalid();
+                        System.out.println("Enter your number of days: ");
+                        this.daysInput = sc.nextInt();
+                    } else {
+                        check = false;
+                    }
+                }
                 inputMetric(opt);
                 break;
             default:
@@ -113,22 +124,19 @@ public class Summary {
     }
 
     public void noGrouping() {
-        this.dataList = createDataList(userList.size());
-        for (int i = 0; i < userList.size(); i++) {
+        this.dataList = createDataList(listUserRangeTime.size());
+        for (int i = 0; i < listUserRangeTime.size(); i++) {
             for (int j = 1; j <= 1; j++) {
-                (this.dataList.get(i)).add(this.metric.get((j - 1) + i));
+                (this.dataList.get(i)).add(this.listUserMetric.get((j - 1) + i));
             }
         }
         displayGrouping(this.dataList);
     }
 
     public void numOfGroups() {
-
-        int qty_days = userList.size() / this.num_of_group;
-        int checkdays = userList.size() % this.num_of_group;
-
-        if ((this.num_of_group >= 2 || this.num_of_group < 80) && (this.num_of_group <= userList.size())) {
-            if (checkdays <= userList.size()) {
+        int qty_days = listUserRangeTime.size() / this.num_of_group;
+        int checkdays = listUserRangeTime.size() % this.num_of_group;
+            if (checkdays <= listUserRangeTime.size()) {
                 this.dataList = createDataList(this.num_of_group);
                 int count = 0;
                 int pos_datalist = checkdays;
@@ -136,50 +144,37 @@ public class Summary {
                     int value = i * qty_days;
                     if (i == this.num_of_group - pos_datalist) {
                         for (int j = 1; j <= qty_days + 1; j++) {
-                            (dataList.get(i)).add(this.metric.get((j - 1) + value + count));
+                            (dataList.get(i)).add(this.listUserMetric.get((j - 1) + value + count));
                         }
                         count++;
                         pos_datalist--;
                     } else {
                         for (int j = 1; j <= qty_days; j++) {
-                            (this.dataList.get(i)).add(this.metric.get((j - 1) + value));
+                            (this.dataList.get(i)).add(this.listUserMetric.get((j - 1) + value));
                         }
                     }
                 }
             }
             displayGrouping(this.dataList);
-            for (String e : this.subMetric) {
-                System.out.println(e);
-            }
-        } else {
-            annInvalid();
-            numOfGroups();
-        }
     }
 
     public void numOfDays() {
-        this.num_of_group = userList.size() / this.daysInput; // N.O groups in case % == 0
+        this.num_of_group = listUserRangeTime.size() / this.daysInput; // N.O groups in case % == 0
         // Check
-        if (userList.size() % this.daysInput == 0) {
-            this.dataList = createDataList(this.num_of_group);
-            int flag = 0;
-
-            for (int i = 0; i < this.dataList.size(); i++) {
-                for (int j = 0; j < this.daysInput; j++) {
-                    (this.dataList.get(i)).add(this.metric.get(flag));
-                    flag++;
-                }
+        this.dataList = createDataList(this.num_of_group);
+        int flag = 0;
+        for (int i = 0; i < this.dataList.size(); i++) {
+            for (int j = 0; j < this.daysInput; j++) {
+                (this.dataList.get(i)).add(this.listUserMetric.get(flag));
+                flag++;
             }
-            displayGrouping(this.dataList);
-        } else {
-            annInvalid();
-            numOfDays();
         }
+        displayGrouping(this.dataList);
     }
 
     public void runMetric(int num) {
-        convertToArray(this.subListBeforeRange, this.subMetric);
-        convertToArray(this.userList, this.metric);
+        convertToArray(this.listFromBeginToStartDate, this.listByAreaMetric);
+        convertToArray(this.listUserRangeTime, this.listUserMetric);
         switch (num) {
             case 1:
                 noGrouping();
@@ -208,15 +203,15 @@ public class Summary {
         int opt = sc.nextInt();
         switch (opt) {
             case 1:
-                this.userMetric = "cases";
+                this.userMetricChoice = "cases";
                 runMetric(num);
                 break;
             case 2:
-                this.userMetric = "deaths";
+                this.userMetricChoice = "deaths";
                 runMetric(num);
                 break;
             case 3:
-                this.userMetric = "vaccinations";
+                this.userMetricChoice = "vaccinations";
                 runMetric(num);
                 break;
             default:
@@ -231,7 +226,7 @@ public class Summary {
         // go through each group after grouping
         for (int i = 0; i < this.dataList.size(); i++) {
             int sum = 0;
-            if (this.userMetric != "vaccinations") {
+            if (this.userMetricChoice != "vaccinations") {
                 for (String str : this.dataList.get(i)) {
                     int num = Integer.parseInt(str);
                     sum += num;
@@ -250,8 +245,8 @@ public class Summary {
 
     public ArrayList<Integer> upTo() {
         int sumBeforeRange = 0;
-        for (String str : this.subMetric) {
-            if (this.userMetric != "vaccinations") {
+        for (String str : this.listByAreaMetric) {
+            if (this.userMetricChoice != "vaccinations") {
                 int num = Integer.parseInt(str);
                 sumBeforeRange += num;
             }
@@ -259,7 +254,7 @@ public class Summary {
 
         int sumPerGroup = 0;
         for (int i = 0; i < this.dataList.size(); i++) {
-            if (this.userMetric != "vaccinations") {
+            if (this.userMetricChoice != "vaccinations") {
                 for (String str : this.dataList.get(i)) {
                     int num = Integer.parseInt(str);
                     sumPerGroup += num;
@@ -267,7 +262,7 @@ public class Summary {
                 this.upto.add(sumBeforeRange + sumPerGroup);
             } else {
                 for (int j = 0; j < this.dataList.get(i).size(); j++) {
-                    int first_num = Integer.parseInt(this.subMetric.get(0));
+                    int first_num = Integer.parseInt(this.listByAreaMetric.get(0));
                     int last_num = Integer.parseInt((this.dataList.get(i)).get(this.dataList.get(i).size() - 1));
                     sumPerGroup = last_num - first_num;
                 }
@@ -318,6 +313,15 @@ public class Summary {
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(source);
         return m.find();
+    }
+
+    public boolean checkDivisible(int num) {
+        boolean result = true;
+        if(listUserRangeTime.size() % num != 0) {
+            result = false;
+            return result;
+        }
+        return result;
     }
 
     public void annInvalid() {
