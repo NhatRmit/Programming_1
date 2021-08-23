@@ -9,8 +9,10 @@ public class Summary {
     String userMetric = "";
     Scanner sc = new Scanner(System.in);
     ArrayList<String> list = new ArrayList<>();
-    ArrayList<String> userList = new ArrayList<>();
     ArrayList<String> subList = new ArrayList<>();
+    ArrayList<String> subListBeforeRange = new ArrayList<>();
+    ArrayList<String> subMetric = new ArrayList<>();
+    ArrayList<String> userList = new ArrayList<>();
     ArrayList<String> metric = new ArrayList<>();
     ArrayList<Integer> newtotal = new ArrayList<>();
     ArrayList<Integer> upto = new ArrayList<>();
@@ -39,6 +41,14 @@ public class Summary {
         }
 
         for (String e : subList) {
+            if (isContain(e, user.range[0]) != true) {
+                subListBeforeRange.add(e);
+            } else {
+                break;
+            }
+        }
+
+        for (String e : subList) {
             for (int i = 0; i < user.range.length; i++) {
                 if (isContain(e, user.range[i]) == true) {
                     userList.add(e);
@@ -47,11 +57,10 @@ public class Summary {
         }
     }
 
-    public void convertToArray(ArrayList<String> userList2) {
+    public void convertToArray(ArrayList<String> list, ArrayList<String> metric) {
         // convert list to array
-        String[] userListConvert = new String[userList2.size()];
-        userListConvert = userList2.toArray(userListConvert);
-
+        String[] userListConvert = new String[list.size()];
+        userListConvert = list.toArray(userListConvert);
         String[] value;
 
         // get each index
@@ -59,13 +68,13 @@ public class Summary {
             value = s.split(",");
             switch (this.userMetric) {
                 case "cases":
-                    this.metric.add(value[4]);
+                    metric.add(value[4]);
                     break;
                 case "deaths":
-                    this.metric.add(value[5]);
+                    metric.add(value[5]);
                     break;
                 case "vaccinations":
-                    this.metric.add(value[6]);
+                    metric.add(value[6]);
                     break;
                 default:
                     annInvalid();
@@ -139,6 +148,9 @@ public class Summary {
                 }
             }
             displayGrouping(this.dataList);
+            for (String e : this.subMetric) {
+                System.out.println(e);
+            }
         } else {
             annInvalid();
             numOfGroups();
@@ -166,7 +178,8 @@ public class Summary {
     }
 
     public void runMetric(int num) {
-        convertToArray(this.userList);
+        convertToArray(this.subListBeforeRange, this.subMetric);
+        convertToArray(this.userList, this.metric);
         switch (num) {
             case 1:
                 noGrouping();
@@ -235,9 +248,34 @@ public class Summary {
         return this.newtotal;
     }
 
-    public int upTo() {
+    public ArrayList<Integer> upTo() {
+        int sumBeforeRange = 0;
+        for (String str : this.subMetric) {
+            if (this.userMetric != "vaccinations") {
+                int num = Integer.parseInt(str);
+                sumBeforeRange += num;
+            }
+        }
 
-        return -1;
+        int sumPerGroup = 0;
+        for (int i = 0; i < this.dataList.size(); i++) {
+            if (this.userMetric != "vaccinations") {
+                for (String str : this.dataList.get(i)) {
+                    int num = Integer.parseInt(str);
+                    sumPerGroup += num;
+                }
+                this.upto.add(sumBeforeRange + sumPerGroup);
+            } else {
+                for (int j = 0; j < this.dataList.get(i).size(); j++) {
+                    int first_num = Integer.parseInt(this.subMetric.get(0));
+                    int last_num = Integer.parseInt((this.dataList.get(i)).get(this.dataList.get(i).size() - 1));
+                    sumPerGroup = last_num - first_num;
+                }
+                this.upto.add(sumBeforeRange + sumPerGroup);
+            }
+        }
+
+        return this.upto;
     }
 
     public void chooseResultType() {
@@ -251,6 +289,7 @@ public class Summary {
                 System.out.println(newTotal());
                 break;
             case 2:
+
                 System.out.println(upTo());
                 break;
             default:
