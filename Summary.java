@@ -53,26 +53,53 @@ public class Summary {
         br.close();
     }
 
-    public void convertToArray(ArrayList<String> list, ArrayList<String> metric) {
-        // convert list to array
-        String[] userListConvert = new String[list.size()];
-        userListConvert = list.toArray(userListConvert);
-        String[] value;
-        // get each index
-        for (String s : userListConvert) {
-            value = s.split(",");
-            switch (this.userMetricChoice) {
-                case "cases":
-                    this.listUserMetric.add(value[4]);
-                    break;
-                case "deaths":
-                    this.listUserMetric.add(value[5]);
-                    break;
-                case "vaccinations":
-                    this.listUserMetric.add(value[6]);
-                    break;
+    public void noGrouping() {
+        this.dataList = createDataList(listUserRangeTime.size());
+        for (int i = 0; i < listUserRangeTime.size(); i++) {
+            for (int j = 1; j <= 1; j++) {
+                (this.dataList.get(i)).add(this.listUserMetric.get((j - 1) + i));
             }
         }
+        displayGrouping(this.dataList);
+    }
+
+    public void numOfGroups() {
+        int qty_days = listUserRangeTime.size() / this.num_of_group;
+        int checkdays = listUserRangeTime.size() % this.num_of_group;
+            if (checkdays <= listUserRangeTime.size()) {
+                this.dataList = createDataList(this.num_of_group);
+                int count = 0;
+                int pos_datalist = checkdays;
+                for (int i = 0; i < this.num_of_group; i++) {
+                    int value = i * qty_days;
+                    if (i == this.num_of_group - pos_datalist) {
+                        for (int j = 1; j <= qty_days + 1; j++) {
+                            (dataList.get(i)).add(this.listUserMetric.get((j - 1) + value + count));
+                        }
+                        count++;
+                        pos_datalist--;
+                    } else {
+                        for (int j = 1; j <= qty_days; j++) {
+                            (this.dataList.get(i)).add(this.listUserMetric.get((j - 1) + value));
+                        }
+                    }
+                }
+            }
+            displayGrouping(this.dataList);
+    }
+
+    public void numOfDays() {
+        this.num_of_group = listUserRangeTime.size() / this.daysInput; // N.O groups in case % == 0
+        // Check
+        this.dataList = createDataList(this.num_of_group);
+        int flag = 0;
+        for (int i = 0; i < this.dataList.size(); i++) {
+            for (int j = 0; j < this.daysInput; j++) {
+                (this.dataList.get(i)).add(this.listUserMetric.get(flag));
+                flag++;
+            }
+        }
+        displayGrouping(this.dataList);
     }
 
     public void groupData() {
@@ -123,77 +150,7 @@ public class Summary {
         }
     }
 
-    public void noGrouping() {
-        this.dataList = createDataList(listUserRangeTime.size());
-        for (int i = 0; i < listUserRangeTime.size(); i++) {
-            for (int j = 1; j <= 1; j++) {
-                (this.dataList.get(i)).add(this.listUserMetric.get((j - 1) + i));
-            }
-        }
-        displayGrouping(this.dataList);
-    }
-
-    public void numOfGroups() {
-        int qty_days = listUserRangeTime.size() / this.num_of_group;
-        int checkdays = listUserRangeTime.size() % this.num_of_group;
-            if (checkdays <= listUserRangeTime.size()) {
-                this.dataList = createDataList(this.num_of_group);
-                int count = 0;
-                int pos_datalist = checkdays;
-                for (int i = 0; i < this.num_of_group; i++) {
-                    int value = i * qty_days;
-                    if (i == this.num_of_group - pos_datalist) {
-                        for (int j = 1; j <= qty_days + 1; j++) {
-                            (dataList.get(i)).add(this.listUserMetric.get((j - 1) + value + count));
-                        }
-                        count++;
-                        pos_datalist--;
-                    } else {
-                        for (int j = 1; j <= qty_days; j++) {
-                            (this.dataList.get(i)).add(this.listUserMetric.get((j - 1) + value));
-                        }
-                    }
-                }
-            }
-            displayGrouping(this.dataList);
-    }
-
-    public void numOfDays() {
-        this.num_of_group = listUserRangeTime.size() / this.daysInput; // N.O groups in case % == 0
-        // Check
-        this.dataList = createDataList(this.num_of_group);
-        int flag = 0;
-        for (int i = 0; i < this.dataList.size(); i++) {
-            for (int j = 0; j < this.daysInput; j++) {
-                (this.dataList.get(i)).add(this.listUserMetric.get(flag));
-                flag++;
-            }
-        }
-        displayGrouping(this.dataList);
-    }
-
-    public void runMetric(int num) {
-        convertToArray(this.listFromBeginToStartDate, this.listByAreaMetric);
-        convertToArray(this.listUserRangeTime, this.listUserMetric);
-        switch (num) {
-            case 1:
-                noGrouping();
-                chooseResultType();
-                break;
-            case 2:
-                numOfGroups();
-                chooseResultType();
-                break;
-            case 3:
-                numOfDays();
-                chooseResultType();
-                break;
-            default:
-                annInvalid();
-                runMetric(num);
-        }
-    }
-
+    
     public void inputMetric(int num) {
         System.out.println("""
                 Select the information you want to see:
@@ -219,8 +176,30 @@ public class Summary {
                 inputMetric(num);
                 break;
         }
-
     }
+
+    public void runMetric(int num) {
+        convertToArray(this.listFromBeginToStartDate, this.listByAreaMetric);
+        convertToArray(this.listUserRangeTime, this.listUserMetric);
+        switch (num) {
+            case 1:
+                noGrouping();
+                chooseResultType();
+                break;
+            case 2:
+                numOfGroups();
+                chooseResultType();
+                break;
+            case 3:
+                numOfDays();
+                chooseResultType();
+                break;
+            default:
+                annInvalid();
+                runMetric(num);
+        }
+    }
+
 
     public ArrayList<Integer> newTotal() {
         // go through each group after grouping
@@ -228,14 +207,15 @@ public class Summary {
             int sum = 0;
             if (this.userMetricChoice != "vaccinations") {
                 for (String str : this.dataList.get(i)) {
+                    if(str == ""){
+                        str = "0";
+                    }
                     int num = Integer.parseInt(str);
-                    sum += num;
+                    sum += num;  
                 }
             } else {
-                for (int j = 0; j < this.dataList.get(i).size(); j++) {
-                    int first_num = Integer.parseInt((this.dataList.get(i)).get(0));
-                    int last_num = Integer.parseInt((this.dataList.get(i)).get(this.dataList.get(i).size() - 1));
-                    sum = last_num - first_num;
+                for(int j = 0; j<this.dataList.get(i).size(); j++){
+                    
                 }
             }
             this.newtotal.add(sum);
@@ -245,31 +225,46 @@ public class Summary {
 
     public ArrayList<Integer> upTo() {
         int sumBeforeRange = 0;
+        int sumPerGroup = 0;
+        ArrayList<Integer> listMetricInt = new ArrayList<>();
         for (String str : this.listByAreaMetric) {
             if (this.userMetricChoice != "vaccinations") {
+                if(str == ""){
+                   str = "0";
+                }
                 int num = Integer.parseInt(str);
                 sumBeforeRange += num;
             }
         }
 
-        int sumPerGroup = 0;
         for (int i = 0; i < this.dataList.size(); i++) {
             if (this.userMetricChoice != "vaccinations") {
                 for (String str : this.dataList.get(i)) {
+                    if(str == ""){
+                        str = "0";
+                    }
                     int num = Integer.parseInt(str);
                     sumPerGroup += num;
                 }
                 this.upto.add(sumBeforeRange + sumPerGroup);
             } else {
-                for (int j = 0; j < this.dataList.get(i).size(); j++) {
-                    int first_num = Integer.parseInt(this.listByAreaMetric.get(0));
-                    int last_num = Integer.parseInt((this.dataList.get(i)).get(this.dataList.get(i).size() - 1));
-                    sumPerGroup = last_num - first_num;
+                for (String str : this.listByAreaMetric) {
+                    if(str == ""){
+                        str = "0";
+                    }
+                    int num = Integer.parseInt(str);
+                    listMetricInt.add(num);
                 }
-                this.upto.add(sumBeforeRange + sumPerGroup);
+                for (String str : this.dataList.get(i)) {
+                    if(str == ""){
+                        str = "0";
+                    }
+                    int num = Integer.parseInt(str);
+                    listMetricInt.add(num);
+                }
+                this.upto.add(Collections.max(listMetricInt));
             }
         }
-
         return this.upto;
     }
 
@@ -290,6 +285,29 @@ public class Summary {
             default:
                 annInvalid();
                 chooseResultType();
+        }
+    }
+
+    public void convertToArray(ArrayList<String> list, ArrayList<String> metric) {
+        // convert list to array
+        String[] value;
+        String[] userListConvert = new String[list.size()];
+        userListConvert = list.toArray(userListConvert);
+
+        // get each index
+        for (String s : userListConvert) {
+            value = s.split(",");
+            switch (this.userMetricChoice) {
+                case "cases":
+                    metric.add(value[4]);
+                    break;
+                case "deaths":
+                    metric.add(value[5]);
+                    break;
+                case "vaccinations":
+                    metric.add(value[6]);
+                    break;
+            }
         }
     }
 
@@ -323,6 +341,8 @@ public class Summary {
         }
         return result;
     }
+
+
 
     public void annInvalid() {
         System.out.println("Your input is INVALID. Please, input again!");
