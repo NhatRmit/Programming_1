@@ -3,6 +3,8 @@ import java.util.*;
 import java.util.regex.*;
 
 public class Summary {
+    //Data Fields
+
     int num_of_group, daysInput;
     String path = "java/src/covid-data.csv";
     String line = "";
@@ -14,11 +16,12 @@ public class Summary {
     ArrayList<String> listByAreaMetric = new ArrayList<>();
     ArrayList<String> listUserRangeTime = new ArrayList<>();
     ArrayList<String> listUserMetric = new ArrayList<>();
-    ArrayList<Integer> newtotal = new ArrayList<>();
-    ArrayList<Integer> upto = new ArrayList<>();
+    ArrayList<Integer> newTotal = new ArrayList<>();
+    ArrayList<Integer> upTo = new ArrayList<>();
     List<List<String>> dataList = new ArrayList<>();
     Data user = new Data();
 
+    //Constructor
     public void summary() throws Exception, FileNotFoundException {
         user.inputArea();
         user.timeRangeType();
@@ -26,16 +29,21 @@ public class Summary {
         groupData();
     }
 
+    //Methods
     public void fetchData() throws IOException {
+        //fetch data
         BufferedReader br = new BufferedReader(new FileReader(path));
         while ((line = br.readLine()) != null) {
-            list.add(line);
+            list.add(line.toLowerCase(Locale.ROOT));
         }
+        //Area filtered
         for (String e : list) {
             if (isContain(e, user.area) == true) {
                 listByArea.add(e);
             }
         }
+
+        //
         for (String e : listByArea) {
             if (isContain(e, user.range[0]) != true) {
                 listFromBeginToStartDate.add(e);
@@ -66,26 +74,26 @@ public class Summary {
     public void numOfGroups() {
         int qty_days = listUserRangeTime.size() / this.num_of_group;
         int checkdays = listUserRangeTime.size() % this.num_of_group;
-            if (checkdays <= listUserRangeTime.size()) {
-                this.dataList = createDataList(this.num_of_group);
-                int count = 0;
-                int pos_datalist = checkdays;
-                for (int i = 0; i < this.num_of_group; i++) {
-                    int value = i * qty_days;
-                    if (i == this.num_of_group - pos_datalist) {
-                        for (int j = 1; j <= qty_days + 1; j++) {
-                            (dataList.get(i)).add(this.listUserMetric.get((j - 1) + value + count));
-                        }
-                        count++;
-                        pos_datalist--;
-                    } else {
-                        for (int j = 1; j <= qty_days; j++) {
-                            (this.dataList.get(i)).add(this.listUserMetric.get((j - 1) + value));
-                        }
+        if (checkdays <= listUserRangeTime.size()) {
+            this.dataList = createDataList(this.num_of_group);
+            int count = 0;
+            int pos_datalist = checkdays;
+            for (int i = 0; i < this.num_of_group; i++) {
+                int value = i * qty_days;
+                if (i == this.num_of_group - pos_datalist) {
+                    for (int j = 1; j <= qty_days + 1; j++) {
+                        (dataList.get(i)).add(this.listUserMetric.get((j - 1) + value + count));
+                    }
+                    count++;
+                    pos_datalist--;
+                } else {
+                    for (int j = 1; j <= qty_days; j++) {
+                        (this.dataList.get(i)).add(this.listUserMetric.get((j - 1) + value));
                     }
                 }
             }
-            displayGrouping(this.dataList);
+        }
+        displayGrouping(this.dataList);
     }
 
     public void numOfDays() {
@@ -115,13 +123,13 @@ public class Summary {
             case 1:
                 inputMetric(opt);
                 break;
-            case 2:   
+            case 2:
                 System.out.println("Please choose number of group that you want: ");
                 this.num_of_group = sc.nextInt();
-                while(check) {
+                while (check) {
                     if ((this.num_of_group >= 2 && this.num_of_group < 80) && (this.num_of_group <= listUserRangeTime.size())) {
                         check = false;
-                    }  else {
+                    } else {
                         annInvalid();
                         System.out.println("Please choose number of group that you want: ");
                         this.num_of_group = sc.nextInt();
@@ -133,8 +141,8 @@ public class Summary {
             case 3:
                 System.out.println("Enter your number of days: ");
                 this.daysInput = sc.nextInt();
-                while(check){
-                    if(checkDivisible(this.daysInput) != true){
+                while (check) {
+                    if (checkDivisible(this.daysInput) != true) {
                         annInvalid();
                         System.out.println("Enter your number of days: ");
                         this.daysInput = sc.nextInt();
@@ -150,7 +158,6 @@ public class Summary {
         }
     }
 
-    
     public void inputMetric(int num) {
         System.out.println("""
                 Select the information you want to see:
@@ -203,24 +210,29 @@ public class Summary {
 
     public ArrayList<Integer> newTotal() {
         // go through each group after grouping
+        ArrayList<String> max = new ArrayList<>();
+        ArrayList<String> converted_max = new ArrayList<>();
+        int result = 0;
         for (int i = 0; i < this.dataList.size(); i++) {
             int sum = 0;
             if (this.userMetricChoice != "vaccinations") {
                 for (String str : this.dataList.get(i)) {
-                    if(str == ""){
+                    if (str == "") {
                         str = "0";
                     }
-                    int num = Integer.parseInt(str);
-                    sum += num;  
+                    int num = Integer.parseInt(str); // Convert to Int in order to sum up
+                    sum += num;
                 }
             } else {
-                for(int j = 0; j<this.dataList.get(i).size(); j++){
-                    
+                for (String s : dataList.get(i)) { //groups
+                    max.add(s);
                 }
+                converted_max.add(Collections.max(max));
             }
-            this.newtotal.add(sum);
+            System.out.println(converted_max);
+            this.newTotal.add(sum);
         }
-        return this.newtotal;
+        return this.newTotal;
     }
 
     public ArrayList<Integer> upTo() {
@@ -229,8 +241,8 @@ public class Summary {
         ArrayList<Integer> listMetricInt = new ArrayList<>();
         for (String str : this.listByAreaMetric) {
             if (this.userMetricChoice != "vaccinations") {
-                if(str == ""){
-                   str = "0";
+                if (str == "") {
+                    str = "0";
                 }
                 int num = Integer.parseInt(str);
                 sumBeforeRange += num;
@@ -240,32 +252,32 @@ public class Summary {
         for (int i = 0; i < this.dataList.size(); i++) {
             if (this.userMetricChoice != "vaccinations") {
                 for (String str : this.dataList.get(i)) {
-                    if(str == ""){
+                    if (str == "") {
                         str = "0";
                     }
                     int num = Integer.parseInt(str);
                     sumPerGroup += num;
                 }
-                this.upto.add(sumBeforeRange + sumPerGroup);
+                this.upTo.add(sumBeforeRange + sumPerGroup);
             } else {
                 for (String str : this.listByAreaMetric) {
-                    if(str == ""){
+                    if (str == "") {
                         str = "0";
                     }
                     int num = Integer.parseInt(str);
                     listMetricInt.add(num);
                 }
                 for (String str : this.dataList.get(i)) {
-                    if(str == ""){
+                    if (str == "") {
                         str = "0";
                     }
                     int num = Integer.parseInt(str);
                     listMetricInt.add(num);
                 }
-                this.upto.add(Collections.max(listMetricInt));
+                this.upTo.add(Collections.max(listMetricInt));
             }
         }
-        return this.upto;
+        return this.upTo;
     }
 
     public void chooseResultType() {
@@ -335,14 +347,12 @@ public class Summary {
 
     public boolean checkDivisible(int num) {
         boolean result = true;
-        if(listUserRangeTime.size() % num != 0) {
+        if (listUserRangeTime.size() % num != 0) {
             result = false;
             return result;
         }
         return result;
     }
-
-
 
     public void annInvalid() {
         System.out.println("Your input is INVALID. Please, input again!");
