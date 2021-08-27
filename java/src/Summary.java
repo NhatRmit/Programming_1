@@ -300,29 +300,60 @@ public class Summary {
     }
 
     public ArrayList<Integer> newTotal() {
-        ArrayList<String> max = new ArrayList<>();
+        ArrayList<Integer> group = new ArrayList<>();
         ArrayList<String> converted_max = new ArrayList<>();
+        ArrayList<Integer> maxBeforeStartDate = new ArrayList<>();
         // Go through each group in a dataList to calculate data
-        for (int i = 0; i < this.dataList.size(); i++) {
-            int sum = 0;
-            if (this.userMetricChoice != "vaccinations") {
-                // Only calculate new covid cases and deaths
-                for (String str : this.dataList.get(i)) {
-                    int num = Integer.parseInt(convertNullToZero(str)); // Convert to Int in order to sum up
-                    sum += num;
-                }
-            } else {
-                // Only calculate people got vaccinations
-                for (String s : dataList.get(i)) { // groups
-                    max.add(s);
-                }
-                converted_max.add(Collections.max(max));
+        if (this.userMetricChoice != "vaccinations") {
+            for (int i = 0; i < this.dataList.size(); i++) {
+                int sum = 0;
+                
+                    // Only calculate new covid cases and deaths
+                    for (String str : this.dataList.get(i)) {
+                        if (str == "") {
+                            str = "0";
+                        }
+                        int num = Integer.parseInt(str); // Convert to Int in order to sum up
+                        sum += num;
+                    }
+
+                
+                this.newtotal.add(sum);
             }
-            // System.out.println(converted_max);
+        } else {
+            
+            ArrayList<Integer> maxEachGroup = new ArrayList<>();
+            for (String str : this.listByAreaMetricBeforeStartDate) {
+                if (str == "") {
+                    str = "0";
+                }
+                int num = Integer.parseInt(str);
+                maxBeforeStartDate.add(num);
+            }      
+            int maxfirst = Collections.max(maxBeforeStartDate);
 
-            this.newtotal.add(sum);
+            for (int i = 0; i < this.dataList.size(); i++){
+                int maxBigger = 0;
+                for (String str : this.dataList.get(i)) {
+                    if (str == "") {
+                        str = "0";
+                    }
+                    int num = Integer.parseInt(str); // Convert to Int in order to sum up
+                    group.add(num);
+                }
+                maxBigger = Collections.max(group);
+                maxEachGroup.add(maxBigger);
+            }
+            for(int i = 0; i < maxEachGroup.size(); i++){
+                int sum = 0;
+                if(i == 0){
+                    sum = maxEachGroup.get(i) - maxfirst;
+                } else {
+                    sum = maxEachGroup.get(i) - maxEachGroup.get(i-1);
+                }
+                this.newtotal.add(sum);
+            }
         }
-
         return this.newtotal;
     }
 
@@ -340,13 +371,17 @@ public class Summary {
                 // Calculate all the value from beginning upto start date for covid new cases
                 // and deaths
                 for (String str : this.listByAreaMetricBeforeStartDate) {
-                    if (this.userMetricChoice != "vaccinations") {
-                        int num = Integer.parseInt(convertNullToZero(str));
-                        sumBeforeRange += num;
+                    if (str == "") {
+                        str = "0";
                     }
+                    int num = Integer.parseInt(str);
+                    sumBeforeRange += num;
                 }
                 for (String str : this.dataList.get(i)) {
-                    int num = Integer.parseInt(convertNullToZero(str));
+                    if (str == "") {
+                        str = "0";
+                    }
+                    int num = Integer.parseInt(str);
                     sumPerGroup += num;
                 }
                 this.upto.add(sumBeforeRange + sumPerGroup);
@@ -354,11 +389,17 @@ public class Summary {
                 // Only calculate people got vaccinations
                 // Calculate all the value from beginning upto start date for vaccinations
                 for (String str : this.listByAreaMetricBeforeStartDate) {
-                    int num = Integer.parseInt(convertNullToZero(str));
+                    if (str == "") {
+                        str = "0";
+                    }
+                    int num = Integer.parseInt(str);
                     listMetricInt.add(num);
                 }
                 for (String str : this.dataList.get(i)) {
-                    int num = Integer.parseInt(convertNullToZero(str));
+                    if (str == "") {
+                        str = "0";
+                    }
+                    int num = Integer.parseInt(str);
                     listMetricInt.add(num);
                 }
                 this.upto.add(Collections.max(listMetricInt));
@@ -426,13 +467,6 @@ public class Summary {
             return result;
         }
         return result;
-    }
-
-    public String convertNullToZero(String str) {
-        if (str == " ") {
-            return str = "0";
-        }
-        return str;
     }
 
    //3 functions below works together to convert result and time to string to display
