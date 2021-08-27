@@ -103,7 +103,7 @@ public class Summary {
                 (this.dataTime.get(i)).add(this.listUserTimeRange.get((j - 1) + i));
             }
         }
-        displayGrouping(this.dataList);
+
     }
 
     public void numOfGroups() {
@@ -131,7 +131,7 @@ public class Summary {
                 }
             }
         }
-        displayGrouping(this.dataList);
+
     }
 
     public void numOfDays() {
@@ -148,7 +148,7 @@ public class Summary {
                 flag++;
             }
         }
-        displayGrouping(this.dataList);
+
     }
 
     // Let User Choose how to group their data
@@ -300,8 +300,7 @@ public class Summary {
     }
 
     public ArrayList<Integer> newTotal() {
-        ArrayList<Integer> group = new ArrayList<>();
-        ArrayList<String> converted_max = new ArrayList<>();
+        ArrayList<Integer> groupMax = new ArrayList<>();
         ArrayList<Integer> maxBeforeStartDate = new ArrayList<>();
         // Go through each group in a dataList to calculate data
         if (this.userMetricChoice != "vaccinations") {
@@ -339,9 +338,9 @@ public class Summary {
                         str = "0";
                     }
                     int num = Integer.parseInt(str); // Convert to Int in order to sum up
-                    group.add(num);
+                    groupMax.add(num);
                 }
-                maxBigger = Collections.max(group);
+                maxBigger = Collections.max(groupMax);
                 maxEachGroup.add(maxBigger);
             }
             for(int i = 0; i < maxEachGroup.size(); i++){
@@ -447,11 +446,6 @@ public class Summary {
         return list;
     }
 
-    public void displayGrouping(List<List<String>> dataList) {
-        for (List<String> s : dataList) {
-            System.out.println(s);
-        }
-    }
 
     public boolean isContain(String s, String item) {
         String p = "\\b" + item + "\\b";
@@ -485,14 +479,16 @@ public class Summary {
     }
 
     public void convertGroupTimeToArray() {
-        String groupRange = "";
+        String groupFirstDate = "";
+        String groupLastDate = "";
         for (int i = 0; i < this.dataTime.size(); i++) {
-            String temp = "";
             for (int j = 0; j < this.dataTime.get(i).size(); j++) {
-                groupRange = this.dataTime.get(i).get(j);
-                temp += groupRange + " ";
+                groupFirstDate = this.dataTime.get(i).get(0);
             }
-            this.dataTimeString.add(temp);
+            for (int j = 0; j < this.dataTime.get(i).size(); j++) {
+                groupLastDate = this.dataTime.get(i).get(this.dataTime.get(i).size()-1);
+            }
+            this.dataTimeString.add(groupFirstDate + " " + groupLastDate);
         }
     }
 
