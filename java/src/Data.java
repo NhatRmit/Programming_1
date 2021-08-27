@@ -11,7 +11,7 @@ public class Data {
     Scanner sc = new Scanner(System.in);
     LocalDate startDate;
     LocalDate endDate;
-    String[] range;
+    String[] timerange;
     String newString;
     int opt;
 
@@ -19,11 +19,11 @@ public class Data {
     public Data() {
     }
 
-    public Data(String area, LocalDate startDate, LocalDate endDate, String[] range) {
+    public Data(String area, LocalDate startDate, LocalDate endDate, String[] timerange) {
         this.area = area;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.range = range;
+        this.timerange = timerange;
     }
 
     // Methods
@@ -138,13 +138,13 @@ public class Data {
 
     public String[] arrayOfTime() {
         List<LocalDate> listOfDates = this.startDate.datesUntil(this.endDate.plusDays(1)).collect(Collectors.toList());
-        this.range = new String[listOfDates.size()];
+        this.timerange = new String[listOfDates.size()];
         DateTimeFormatter format = DateTimeFormatter.ofPattern("M/d/yyyy");
 
-        for (int i = 0; i < this.range.length; i++) {
-            this.range[i] = (listOfDates.get(i)).format(format);
+        for (int i = 0; i < this.timerange.length; i++) {
+            this.timerange[i] = (listOfDates.get(i)).format(format);
         }
-        return this.range;
+        return this.timerange;
     }
 
     public String[] getPair() {
