@@ -3,12 +3,12 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class Display {
-    static Summary s = new Summary();
+    Summary s = new Summary();
 
     public void tableWithLinesAndMaxWidth() throws FileNotFoundException, Exception {
         boolean rowJustifyLeft = true;
         int tableMaxWidth = 80;
-        s.summary();
+        s.sumData();
 
         String[][] tabular = new String[(s.resultString.size())+1][2];
         tabular[0][0] = "Range";
@@ -100,6 +100,6 @@ public class Display {
                 });
         
     }
+    
 }
-
 
