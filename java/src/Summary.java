@@ -3,86 +3,91 @@ import java.util.*;
 import java.util.regex.*;
 
 public class Summary {
+    // Attribute
     int num_of_group, daysInput;
-
     String path = "java/src/covid-data.csv";
     String line = "";
     String userMetricChoice = "";
+    String resultType = "";
     Scanner sc = new Scanner(System.in);
-
+    // Data Fetched and Filtered by Area
     ArrayList<String> list = new ArrayList<>();
     ArrayList<String> listByArea = new ArrayList<>();
 
+    // Data Filtered by Area and Time from Beginning to Start Date
     ArrayList<String> listFromBeginToStartDate = new ArrayList<>();
     ArrayList<String> listByAreaMetricBeforeStartDate = new ArrayList<>();
     ArrayList<String> listTimeRangeBeforeStartDate = new ArrayList<>();
 
+    // Data of Metric and Time Range User Input
     ArrayList<String> listUserRangeTime = new ArrayList<>();
     ArrayList<String> listUserMetric = new ArrayList<>();
-    ArrayList<String> listTimeRange = new ArrayList<>();
+    ArrayList<String> listUserTimeRange = new ArrayList<>();
 
+    // List of group of metric data and time data
     List<List<String>> dataList = new ArrayList<>();
     List<List<String>> dataTime = new ArrayList<>();
 
+    // List result of newtotal type and upto
     ArrayList<Integer> newtotal = new ArrayList<>();
     ArrayList<Integer> upto = new ArrayList<>();
 
-    ArrayList<String> uptoString = new ArrayList<>();
+    // List convert result to string to display (Result and Time)
+    ArrayList<String> resultString = new ArrayList<>();
     ArrayList<String> dataTimeString = new ArrayList<>();
 
-    String[] uptoConvert = new String[uptoString.size()];
-    String[] dataTimeConvert = new String[dataTimeString.size()];
-
+    // Create a User
     Data user = new Data();
 
-    public void summary() throws Exception, FileNotFoundException {
-        user.inputArea();
-        user.timeRangeType();
-        fetchData();
-        groupData();
-
-        for (int num : this.upto) {
-            String s = String.valueOf(num);
-            this.uptoString.add(s);
-        }
-
-        uptoConvert = uptoString.toArray(uptoConvert);
-        dataTimeConvert = dataTimeString.toArray(dataTimeConvert);
-
-        String groupRange = "";
-        for (int i = 0; i < this.dataTime.size(); i++) {
-            String temp = "";
-            for (int j = 0; j < this.dataTime.get(i).size(); j++) {
-                groupRange = this.dataTime.get(i).get(j);
-                temp += groupRange + " - ";
-
-            }
-            dataTimeString.add(temp);
-        }
+    // Constructor
+    public Summary() {
     }
 
+    // Summary main function
+    public void sumData() throws Exception, FileNotFoundException {
+        //User input data (area and time range)
+        user.inputArea();
+        user.timeRangeType();
+
+        //fetch data and put in list respectively
+        fetchData();
+
+        //ask users how to process their data to get result
+        groupData();
+
+        //convert result from int to string to display
+        processMetricAndTime();
+    }
+
+    // Fetch data from CSV and get data by filter funciton
     public void fetchData() throws IOException {
+        // fetch data from csv
         BufferedReader br = new BufferedReader(new FileReader(path));
         while ((line = br.readLine()) != null) {
-            list.add(line.toLowerCase(Locale.ROOT));
+            this.list.add(line.toLowerCase(Locale.ROOT));
         }
 
-        for (String e : list) {
+        // filter data by area user inputs
+        for (String e : this.list) {
             if (isContain(e, user.area) == true) {
-                listByArea.add(e);
+                this.listByArea.add(e);
             }
         }
-        for (String e : listByArea) {
-            if (isContain(e, user.range[0]) != true) {
-                listFromBeginToStartDate.add(e);
+
+        // filter data from beginning of the area to the start date user inputs
+        for (String e : this.listByArea) {
+            if (isContain(e, user.timerange[0]) != true) {
+                this.listFromBeginToStartDate.add(e);
             } else {
                 break;
             }
         }
-        for (String e : listByArea) {
-            for (int i = 0; i < user.range.length; i++) {
-                if (isContain(e, user.range[i]) == true) {
-                    listUserRangeTime.add(e);
+
+        // get data by area and time range that user inputs
+        for (String e : this.listByArea) {
+            for (int i = 0; i < user.timerange.length; i++) {
+                if (isContain(e, user.timerange[i]) == true) {
+                    this.listUserRangeTime.add(e);
                 }
             }
         }
@@ -95,7 +100,7 @@ public class Summary {
         for (int i = 0; i < listUserRangeTime.size(); i++) {
             for (int j = 1; j <= 1; j++) {
                 (this.dataList.get(i)).add(this.listUserMetric.get((j - 1) + i));
-                (this.dataTime.get(i)).add(this.listTimeRange.get((j - 1) + i));
+                (this.dataTime.get(i)).add(this.listUserTimeRange.get((j - 1) + i));
             }
         }
         displayGrouping(this.dataList);
@@ -114,14 +119,14 @@ public class Summary {
                 if (i == this.num_of_group - pos_datalist) {
                     for (int j = 1; j <= qty_days + 1; j++) {
                         (this.dataList.get(i)).add(this.listUserMetric.get((j - 1) + value + count));
-                        (this.dataTime.get(i)).add(this.listTimeRange.get((j - 1) + value + count));
+                        (this.dataTime.get(i)).add(this.listUserTimeRange.get((j - 1) + value + count));
                     }
                     count++;
                     pos_datalist--;
                 } else {
                     for (int j = 1; j <= qty_days; j++) {
                         (this.dataList.get(i)).add(this.listUserMetric.get((j - 1) + value));
-                        (this.dataTime.get(i)).add(this.listTimeRange.get((j - 1) + value + count));
+                        (this.dataTime.get(i)).add(this.listUserTimeRange.get((j - 1) + value + count));
                     }
                 }
             }
@@ -139,13 +144,14 @@ public class Summary {
         for (int i = 0; i < this.dataList.size(); i++) {
             for (int j = 0; j < this.daysInput; j++) {
                 (this.dataList.get(i)).add(this.listUserMetric.get(flag));
-                (this.dataTime.get(i)).add(this.listTimeRange.get(flag));
+                (this.dataTime.get(i)).add(this.listUserTimeRange.get(flag));
                 flag++;
             }
         }
         displayGrouping(this.dataList);
     }
 
+    // Let User Choose how to group their data
     public void groupData() {
         int opt;
         System.out.println("""
@@ -157,11 +163,14 @@ public class Summary {
         boolean check = true;
         switch (opt) {
             case 1:
+                // Nogrouping Option
                 inputMetric(opt);
                 break;
             case 2:
+                // Number of groups Option
                 System.out.println("Please choose number of group that you want: ");
                 this.num_of_group = sc.nextInt();
+                // Input again if their input is invalid
                 while (check) {
                     if ((this.num_of_group >= 2 && this.num_of_group < 80)
                             && (this.num_of_group <= listUserRangeTime.size())) {
@@ -176,8 +185,10 @@ public class Summary {
                 inputMetric(opt);
                 break;
             case 3:
+                // Number of days in a group
                 System.out.println("Enter your number of days: ");
                 this.daysInput = sc.nextInt();
+                // Input again if their input is invalid
                 while (check) {
                     if (checkDivisible(this.daysInput) != true) {
                         annInvalid();
@@ -190,11 +201,13 @@ public class Summary {
                 inputMetric(opt);
                 break;
             default:
+                // Input again if their input is invalid
                 annInvalid();
                 groupData();
         }
     }
 
+    // Let Users choose their metric
     public void inputMetric(int num) {
         System.out.println("""
                 Select the information you want to see:
@@ -204,121 +217,64 @@ public class Summary {
         int opt = sc.nextInt();
         switch (opt) {
             case 1:
+                // Metric is new covid cases
                 this.userMetricChoice = "cases";
                 runMetric(num);
                 break;
             case 2:
+                // Metric is people deaths
                 this.userMetricChoice = "deaths";
                 runMetric(num);
                 break;
             case 3:
+                // Metric is people who got vaccinated
                 this.userMetricChoice = "vaccinations";
                 runMetric(num);
                 break;
             default:
+                // Input again because their input is invalid
                 annInvalid();
                 inputMetric(num);
                 break;
         }
     }
 
+    // runMetric function will proccess to get exact metric data and then group
+    // users data as their choices and
+    // choose result type
     public void runMetric(int num) {
-        convertToArray(this.listFromBeginToStartDate, this.listByAreaMetricBeforeStartDate,
+        // Get Metric Data from beginning of the area to start date in order to
+        // calculate the upTo function
+        getMetricDataAndTimeRange(this.listFromBeginToStartDate, this.listByAreaMetricBeforeStartDate,
                 this.listTimeRangeBeforeStartDate);
-        convertToArray(this.listUserRangeTime, this.listUserMetric, this.listTimeRange);
+        // Get Metric Data and Time Range Data as user choice
+        getMetricDataAndTimeRange(this.listUserRangeTime, this.listUserMetric, this.listUserTimeRange);
         switch (num) {
             case 1:
+                // Run no grouping and run function to choose result type to calculate
                 noGrouping();
                 chooseResultType();
                 break;
             case 2:
+                // Run number of groups grouping and run function to choose result type to
+                // calculate
                 numOfGroups();
                 chooseResultType();
                 break;
             case 3:
+                // Run number of days in a group grouping and run function to choose result type
+                // to calculate
                 numOfDays();
                 chooseResultType();
                 break;
             default:
+                // Input value is invalid, input again announcement
                 annInvalid();
                 runMetric(num);
         }
     }
 
-    public ArrayList<Integer> newTotal() {
-        // go through each group after grouping
-                ArrayList<String> max = new ArrayList<>();
-                ArrayList<String> converted_max = new ArrayList<>();
-                int result = 0;
-                for (int i = 0; i < this.dataList.size(); i++) {
-                    int sum = 0;
-                    if (this.userMetricChoice != "vaccinations") {
-                        for (String str : this.dataList.get(i)) {
-                            if (str == "") {
-                                str = "0";
-                            }
-                            int num = Integer.parseInt(str); // Convert to Int in order to sum up
-                            sum += num;
-                        }
-                    } else {
-                        for (String s : dataList.get(i)) { //groups
-                            max.add(s);
-                        }
-                        converted_max.add(Collections.max(max));
-                    }
-                    System.out.println(converted_max);
-                    
-                    this.newtotal.add(sum);
-                }
-
-                return this.newtotal;
-    }
-
-    public ArrayList<Integer> upTo() {
-        int sumBeforeRange = 0;
-        int sumPerGroup = 0;
-        ArrayList<Integer> listMetricInt = new ArrayList<>();
-        for (String str : this.listByAreaMetricBeforeStartDate) {
-            if (this.userMetricChoice != "vaccinations") {
-                if (str == "") {
-                    str = "0";
-                }
-                int num = Integer.parseInt(str);
-                sumBeforeRange += num;
-            }
-        }
-
-        for (int i = 0; i < this.dataList.size(); i++) {
-            if (this.userMetricChoice != "vaccinations") {
-                for (String str : this.dataList.get(i)) {
-                    if (str == "") {
-                        str = "0";
-                    }
-                    int num = Integer.parseInt(str);
-                    sumPerGroup += num;
-                }
-                this.upto.add(sumBeforeRange + sumPerGroup);
-            } else {
-                for (String str : this.listByAreaMetricBeforeStartDate) {
-                    if (str == "") {
-                        str = "0";
-                    }
-                    int num = Integer.parseInt(str);
-                    listMetricInt.add(num);
-                }
-                for (String str : this.dataList.get(i)) {
-                    if (str == "") {
-                        str = "0";
-                    }
-                    int num = Integer.parseInt(str);
-                    listMetricInt.add(num);
-                }
-                this.upto.add(Collections.max(listMetricInt));
-            }
-        }
-        return this.upto;
-    }
-
+    // User Chooses result type function
     public void chooseResultType() {
         System.out.println("""
                 Select the the result type:
@@ -327,18 +283,94 @@ public class Summary {
         int option = sc.nextInt();
         switch (option) {
             case 1:
+                // Run function newTotal and get the resultType String to use later in display
+                this.resultType = "newtotal";
                 System.out.println(newTotal());
                 break;
             case 2:
+                // Run function upTo and get the resultType String to use later in display
+                this.resultType = "upto";
                 System.out.println(upTo());
                 break;
             default:
+                // Input is invalid, announce and ask users to input again
                 annInvalid();
                 chooseResultType();
         }
     }
 
-    public void convertToArray(ArrayList<String> list, ArrayList<String> metric, ArrayList<String> rangetime) {
+    public ArrayList<Integer> newTotal() {
+        ArrayList<String> max = new ArrayList<>();
+        ArrayList<String> converted_max = new ArrayList<>();
+        // Go through each group in a dataList to calculate data
+        for (int i = 0; i < this.dataList.size(); i++) {
+            int sum = 0;
+            if (this.userMetricChoice != "vaccinations") {
+                // Only calculate new covid cases and deaths
+                for (String str : this.dataList.get(i)) {
+                    int num = Integer.parseInt(convertNullToZero(str)); // Convert to Int in order to sum up
+                    sum += num;
+                }
+            } else {
+                // Only calculate people got vaccinations
+                for (String s : dataList.get(i)) { // groups
+                    max.add(s);
+                }
+                converted_max.add(Collections.max(max));
+            }
+            // System.out.println(converted_max);
+
+            this.newtotal.add(sum);
+        }
+
+        return this.newtotal;
+    }
+
+    public ArrayList<Integer> upTo() {
+        int sumBeforeRange = 0;
+        int sumPerGroup = 0;
+        ArrayList<Integer> listMetricInt = new ArrayList<>();
+
+
+        // Calculate all the value each group then plus with the sumBefore Range to get
+        // upTo of each group in list
+        for (int i = 0; i < this.dataList.size(); i++) {
+            // Only calculate new covid cases and deaths
+            if (this.userMetricChoice != "vaccinations") {
+                // Calculate all the value from beginning upto start date for covid new cases
+                // and deaths
+                for (String str : this.listByAreaMetricBeforeStartDate) {
+                    if (this.userMetricChoice != "vaccinations") {
+                        int num = Integer.parseInt(convertNullToZero(str));
+                        sumBeforeRange += num;
+                    }
+                }
+                for (String str : this.dataList.get(i)) {
+                    int num = Integer.parseInt(convertNullToZero(str));
+                    sumPerGroup += num;
+                }
+                this.upto.add(sumBeforeRange + sumPerGroup);
+            } else {
+                // Only calculate people got vaccinations
+                // Calculate all the value from beginning upto start date for vaccinations
+                for (String str : this.listByAreaMetricBeforeStartDate) {
+                    int num = Integer.parseInt(convertNullToZero(str));
+                    listMetricInt.add(num);
+                }
+                for (String str : this.dataList.get(i)) {
+                    int num = Integer.parseInt(convertNullToZero(str));
+                    listMetricInt.add(num);
+                }
+                this.upto.add(Collections.max(listMetricInt));
+            }
+        }
+
+        return this.upto;
+    }
+
+
+    public void getMetricDataAndTimeRange(ArrayList<String> list, ArrayList<String> metric,
+            ArrayList<String> rangetime) {
         // convert list to array
         String[] value;
         String[] userListConvert = new String[list.size()];
@@ -364,6 +396,7 @@ public class Summary {
         }
     }
 
+    //Function supports to create DataList (List contains groups)
     public List<List<String>> createDataList(List<List<String>> list, int num_of_group) {
         list = new ArrayList<>();
         for (int i = 1; i <= num_of_group; i++) {
@@ -395,6 +428,47 @@ public class Summary {
         return result;
     }
 
+    public String convertNullToZero(String str) {
+        if (str == " ") {
+            return str = "0";
+        }
+        return str;
+    }
+
+   //3 functions below works together to convert result and time to string to display
+    public void convertResultToString() {
+        if (this.resultType == "newtotal") {
+            for (int num : this.newtotal) {
+                String s = String.valueOf(num);
+                this.resultString.add(s);
+            }
+        } else {
+            for (int num : this.upto) {
+                String s = String.valueOf(num);
+                this.resultString.add(s);
+            }
+        }
+    }
+
+    public void convertGroupTimeToArray() {
+        String groupRange = "";
+        for (int i = 0; i < this.dataTime.size(); i++) {
+            String temp = "";
+            for (int j = 0; j < this.dataTime.get(i).size(); j++) {
+                groupRange = this.dataTime.get(i).get(j);
+                temp += groupRange + " ";
+            }
+            this.dataTimeString.add(temp);
+        }
+    }
+
+    //Convert both time and result to string
+    public void processMetricAndTime() {
+        convertResultToString();
+        convertGroupTimeToArray();
+    }
+
+    //Announcement invalid function
     public void annInvalid() {
         System.out.println("Your input is INVALID. Please, input again!");
     }
