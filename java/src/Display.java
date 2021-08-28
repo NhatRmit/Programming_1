@@ -5,6 +5,9 @@ import java.util.stream.Stream;
 public class Display {
     Summary s = new Summary();
 
+    public Display() {
+    }
+
     public void displayTabular() throws FileNotFoundException, Exception {
         boolean rowJustifyLeft = true;
         int tableMaxWidth = 30;
