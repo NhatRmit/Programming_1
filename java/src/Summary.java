@@ -9,6 +9,7 @@ public class Summary {
     String line = "";
     String userMetricChoice = "";
     String resultType = "";
+    int opt = 0;
     Scanner sc = new Scanner(System.in);
     // Data Fetched and Filtered by Area
     ArrayList<String> list = new ArrayList<>();
@@ -45,17 +46,17 @@ public class Summary {
 
     // Summary main function
     public void sumData() throws Exception, FileNotFoundException {
-        //User input data (area and time range)
+        // User input data (area and time range)
         user.inputArea();
         user.timeRangeType();
 
-        //fetch data and put in list respectively
+        // fetch data and put in list respectively
         fetchData();
 
-        //ask users how to process their data to get result
+        // ask users how to process their data to get result
         groupData();
 
-        //convert result from int to string to display
+        // convert result from int to string to display
         processMetricAndTime();
     }
 
@@ -68,9 +69,35 @@ public class Summary {
         }
 
         // filter data by area user inputs
-        for (String e : this.list) {
-            if (isContain(e, user.area) == true) {
-                this.listByArea.add(e);
+        if (user.chooseAreaInput == 1) {
+            for (String e : this.list) {
+                if (isContain(e, user.area) == true) {
+                    this.listByArea.add(e);
+                }
+            }
+        } else {
+            for (String e : this.list) {
+                if (isContain(e, user.area) && ((isContain(e, "owid_asi")) ||
+
+                        (isContain(e, "owid_eur")) ||
+
+                        (isContain(e, "owid_afr")) ||
+
+                        (isContain(e, "owid_oce")) ||
+
+                        (isContain(e, "owid_nam")) ||
+
+                        (isContain(e, "owid_eun")) ||
+
+                        (isContain(e, "owid_sam"))
+
+                )) {
+                    this.listByArea.add(e);
+                }
+
+                if (isContain(e, user.area) && isContain(e, "owid")) {
+                    this.listByArea.add(e);
+                }
             }
         }
 
@@ -97,13 +124,13 @@ public class Summary {
     public void noGrouping() {
         this.dataList = createDataList(this.dataList, listUserRangeTime.size());
         this.dataTime = createDataList(this.dataTime, listUserRangeTime.size());
+        this.num_of_group = listUserRangeTime.size();
         for (int i = 0; i < listUserRangeTime.size(); i++) {
             for (int j = 1; j <= 1; j++) {
                 (this.dataList.get(i)).add(this.listUserMetric.get((j - 1) + i));
                 (this.dataTime.get(i)).add(this.listUserTimeRange.get((j - 1) + i));
             }
         }
-
     }
 
     public void numOfGroups() {
@@ -148,18 +175,17 @@ public class Summary {
                 flag++;
             }
         }
-
     }
 
     // Let User Choose how to group their data
     public void groupData() {
-        int opt;
+
         System.out.println("""
                 How would you group your data:
                 1. No Grouping
                 2. Number of Groups
                 3. Number of Days in a group""");
-        opt = sc.nextInt();
+        this.opt = sc.nextInt();
         boolean check = true;
         switch (opt) {
             case 1:
@@ -173,7 +199,7 @@ public class Summary {
                 // Input again if their input is invalid
                 while (check) {
                     if ((this.num_of_group >= 2 && this.num_of_group < 80)
-                            && (this.num_of_group <= listUserRangeTime.size())) {
+                            && (this.num_of_group <= this.listUserRangeTime.size())) {
                         check = false;
                     } else {
                         annInvalid();
@@ -285,12 +311,12 @@ public class Summary {
             case 1:
                 // Run function newTotal and get the resultType String to use later in display
                 this.resultType = "newtotal";
-                System.out.println(newTotal());
+                newTotal();
                 break;
             case 2:
                 // Run function upTo and get the resultType String to use later in display
                 this.resultType = "upto";
-                System.out.println(upTo());
+                upTo();
                 break;
             default:
                 // Input is invalid, announce and ask users to input again
@@ -306,21 +332,20 @@ public class Summary {
         if (this.userMetricChoice != "vaccinations") {
             for (int i = 0; i < this.dataList.size(); i++) {
                 int sum = 0;
-                
-                    // Only calculate new covid cases and deaths
-                    for (String str : this.dataList.get(i)) {
-                        if (str == "") {
-                            str = "0";
-                        }
-                        int num = Integer.parseInt(str); // Convert to Int in order to sum up
-                        sum += num;
-                    }
 
-                
+                // Only calculate new covid cases and deaths
+                for (String str : this.dataList.get(i)) {
+                    if (str == "") {
+                        str = "0";
+                    }
+                    int num = Integer.parseInt(str); // Convert to Int in order to sum up
+                    sum += num;
+                }
+
                 this.newtotal.add(sum);
             }
         } else {
-            
+
             ArrayList<Integer> maxEachGroup = new ArrayList<>();
             for (String str : this.listByAreaMetricBeforeStartDate) {
                 if (str == "") {
@@ -328,10 +353,10 @@ public class Summary {
                 }
                 int num = Integer.parseInt(str);
                 maxBeforeStartDate.add(num);
-            }      
+            }
             int maxfirst = Collections.max(maxBeforeStartDate);
 
-            for (int i = 0; i < this.dataList.size(); i++){
+            for (int i = 0; i < this.dataList.size(); i++) {
                 int maxBigger = 0;
                 for (String str : this.dataList.get(i)) {
                     if (str == "") {
@@ -343,12 +368,12 @@ public class Summary {
                 maxBigger = Collections.max(groupMax);
                 maxEachGroup.add(maxBigger);
             }
-            for(int i = 0; i < maxEachGroup.size(); i++){
+            for (int i = 0; i < maxEachGroup.size(); i++) {
                 int sum = 0;
-                if(i == 0){
+                if (i == 0) {
                     sum = maxEachGroup.get(i) - maxfirst;
                 } else {
-                    sum = maxEachGroup.get(i) - maxEachGroup.get(i-1);
+                    sum = maxEachGroup.get(i) - maxEachGroup.get(i - 1);
                 }
                 this.newtotal.add(sum);
             }
@@ -360,7 +385,6 @@ public class Summary {
         int sumBeforeRange = 0;
         int sumPerGroup = 0;
         ArrayList<Integer> listMetricInt = new ArrayList<>();
-
 
         // Calculate all the value each group then plus with the sumBefore Range to get
         // upTo of each group in list
@@ -408,7 +432,6 @@ public class Summary {
         return this.upto;
     }
 
-
     public void getMetricDataAndTimeRange(ArrayList<String> list, ArrayList<String> metric,
             ArrayList<String> rangetime) {
         // convert list to array
@@ -436,7 +459,7 @@ public class Summary {
         }
     }
 
-    //Function supports to create DataList (List contains groups)
+    // Function supports to create DataList (List contains groups)
     public List<List<String>> createDataList(List<List<String>> list, int num_of_group) {
         list = new ArrayList<>();
         for (int i = 1; i <= num_of_group; i++) {
@@ -445,7 +468,6 @@ public class Summary {
         }
         return list;
     }
-
 
     public boolean isContain(String s, String item) {
         String p = "\\b" + item + "\\b";
@@ -463,7 +485,8 @@ public class Summary {
         return result;
     }
 
-   //3 functions below works together to convert result and time to string to display
+    // 3 functions below works together to convert result and time to string to
+    // display
     public void convertResultToString() {
         if (this.resultType == "newtotal") {
             for (int num : this.newtotal) {
@@ -481,24 +504,34 @@ public class Summary {
     public void convertGroupTimeToArray() {
         String groupFirstDate = "";
         String groupLastDate = "";
-        for (int i = 0; i < this.dataTime.size(); i++) {
-            for (int j = 0; j < this.dataTime.get(i).size(); j++) {
+        if (this.opt == 1) {
+            for (int i = 0; i < this.dataTime.size(); i++) {
                 groupFirstDate = this.dataTime.get(i).get(0);
+                this.dataTimeString.add(groupFirstDate);
             }
-            for (int j = 0; j < this.dataTime.get(i).size(); j++) {
-                groupLastDate = this.dataTime.get(i).get(this.dataTime.get(i).size()-1);
+        } else {
+            if(this.num_of_group == listUserRangeTime.size()){
+                for (int i = 0; i < this.dataTime.size(); i++) {
+                    groupFirstDate = this.dataTime.get(i).get(0);
+                    this.dataTimeString.add(groupFirstDate);
+                }
             }
-            this.dataTimeString.add(groupFirstDate + " " + groupLastDate);
+            for (int i = 0; i < this.dataTime.size(); i++) {
+                groupFirstDate = this.dataTime.get(i).get(0);
+                groupLastDate = this.dataTime.get(i).get(this.dataTime.get(i).size() - 1);
+                this.dataTimeString.add(groupFirstDate + " " + groupLastDate);
+            }
         }
+
     }
 
-    //Convert both time and result to string
+    // Convert both time and result to string
     public void processMetricAndTime() {
         convertResultToString();
         convertGroupTimeToArray();
     }
 
-    //Announcement invalid function
+    // Announcement invalid function
     public void annInvalid() {
         System.out.println("Your input is INVALID. Please, input again!");
     }
