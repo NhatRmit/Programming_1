@@ -101,18 +101,15 @@ public class Display {
         });
     }
 
-    public void displayChart() throws FileNotFoundException, Exception {
+        public void displayChart() throws FileNotFoundException, Exception {
         s.sumData();
         int rows = 24;
         int columns = 80;
         ArrayList<Integer> testing = new ArrayList<>();
         ArrayList<Integer> test = new ArrayList<>();
+        String[][] chart = new String[rows][columns];
 
-        String[][] array = new String[rows][columns];
-        System.out.println(Collections.max(s.newtotal));
-        System.out.println(Collections.min(s.newtotal));
 
-        System.out.println((columns - 1) / s.num_of_group);
         int value = (columns - 1) / s.num_of_group;
         int colValue = 1;
         for (int i = 1; i <= s.num_of_group; i++) {
@@ -120,39 +117,47 @@ public class Display {
             testing.add(colValue);
         }
 
-        test.add(0); //max
-        test.add(10);
-        test.add(rows-2); //min
+
+        int temp = Collections.min(s.newtotal);
+        double minDisBetweenTwoValue = (Collections.max(s.newtotal) - Collections.min(s.newtotal)) / 23.0;
 
 
-
-        for (int i : testing) {
-            System.out.println(i);
+        for (int k : s.newtotal){
+            double newtotalDouble = k;
+            double minnewtotal = temp;
+            for (int i = rows-2; i >= 0; i--){
+                minnewtotal += minDisBetweenTwoValue;
+                if (minnewtotal > newtotalDouble) {
+                    test.add(i);
+                    break;
+                }
+            }
         }
+
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                array[i][j] = " ";
+                chart[i][j] = " ";
                 if (i != rows - 1) {
                     for(int k = 0; k < testing.size(); k++){
-                        array[test.get(k)][testing.get(k)] = "*";
+                        chart[test.get(k)][testing.get(k)] = "*";
                     }
                 } else {
-                    array[rows - 1][0] = "|";
+                    chart[rows - 1][0] = "|";
                     break;
                 }
-
-                array[i][0] = "|";
-                array[rows - 1][j] = "_";
+                chart[i][0] = "|";
+                chart[rows - 1][j] = "_";
             }
         }
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                System.out.print(array[i][j]);
+                System.out.print(chart[i][j]);
             }
             System.out.println();
         }
     }
+      
 
 }
