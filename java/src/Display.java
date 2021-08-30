@@ -5,9 +5,6 @@ import java.util.stream.Stream;
 public class Display {
     Summary s = new Summary();
 
-    public Display() {
-    }
-
     public void displayTabular() throws FileNotFoundException, Exception {
         boolean rowJustifyLeft = true;
         int tableMaxWidth = 30;
@@ -25,6 +22,10 @@ public class Display {
             tabular[i][1] = s.resultString.get(i - 1);
         }
 
+        if(s.dataTimeString.size() < 1 && s.resultString.size() < 1){
+            System.out.println("Your data input does not have information!");
+        }
+        
         ArrayList<String[]> table = new ArrayList<>(Arrays.asList(tabular));
         ArrayList<String[]> tableFinale = new ArrayList<>();
         for (String[] row : table) {
@@ -101,26 +102,23 @@ public class Display {
         });
     }
 
-        public void displayChart() throws FileNotFoundException, Exception {
+    public void displayChart() throws FileNotFoundException, Exception {
         s.sumData();
         int rows = 24;
         int columns = 80;
-        ArrayList<Integer> testing = new ArrayList<>();
-        ArrayList<Integer> test = new ArrayList<>();
+        ArrayList<Integer> timegroup = new ArrayList<>();
+        ArrayList<Integer> valuegroup = new ArrayList<>();
         String[][] chart = new String[rows][columns];
-
 
         int value = (columns - 1) / s.num_of_group;
         int colValue = 1;
         for (int i = 1; i <= s.num_of_group; i++) {
             colValue = value * i;
-            testing.add(colValue);
+            timegroup.add(colValue);
         }
-
 
         int temp = Collections.min(s.newtotal);
         double minDisBetweenTwoValue = (Collections.max(s.newtotal) - Collections.min(s.newtotal)) / 23.0;
-
 
         for (int k : s.newtotal){
             double newtotalDouble = k;
@@ -128,19 +126,18 @@ public class Display {
             for (int i = rows-2; i >= 0; i--){
                 minnewtotal += minDisBetweenTwoValue;
                 if (minnewtotal > newtotalDouble) {
-                    test.add(i);
+                    valuegroup.add(i);
                     break;
                 }
             }
         }
 
-
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 chart[i][j] = " ";
                 if (i != rows - 1) {
-                    for(int k = 0; k < testing.size(); k++){
-                        chart[test.get(k)][testing.get(k)] = "*";
+                    for(int k = 0; k < timegroup.size(); k++){
+                        chart[valuegroup.get(k)][timegroup.get(k)] = "*";
                     }
                 } else {
                     chart[rows - 1][0] = "|";
@@ -157,7 +154,9 @@ public class Display {
             }
             System.out.println();
         }
-    }
-      
 
+        if(s.dataTimeString.size() < 1 && s.resultString.size() < 1){
+            System.out.println("Your data input does not have information!");
+        }
+    }
 }
