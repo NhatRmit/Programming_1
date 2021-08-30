@@ -13,7 +13,8 @@ public class Data {
     LocalDate endDate;
     String[] timerange;
     String newString;
-    int opt;
+    String s1[];
+    int chooseAreaInput;
 
     // Constructors
     public Data() {
@@ -33,10 +34,10 @@ public class Data {
                 1. Country
                 2. Continent""");
 
-        this.opt = sc.nextInt();
-        sc.nextLine();  // This line is to flush the cache
+        this.chooseAreaInput = sc.nextInt();
+        sc.nextLine(); // This line is to flush the cache
 
-        switch (this.opt) {
+        switch (this.chooseAreaInput) {
             case 1:
                 System.out.println("Input your country: ");
                 this.area = sc.nextLine().toLowerCase(Locale.ROOT);
@@ -51,8 +52,7 @@ public class Data {
         }
     }
 
-
-    public static LocalDate dateInput(String userInput) {
+    public LocalDate dateInput(String userInput) {
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("M/d/yyyy");
         LocalDate date = LocalDate.parse(userInput, dateFormat);
         return date;
@@ -60,14 +60,14 @@ public class Data {
 
     public void timeRangeType() {
         int sub_opt;
+        int opt;
         System.out.println("""
                 Choose your time range:
                 1. Pair
                 2. Number of days or weeks from a particular date
                 3. Number of days or weeks to a particular date""");
-
-        this.opt = sc.nextInt();
-        switch (this.opt) {
+        opt = sc.nextInt();
+        switch (opt) {
             case 1:
                 getPair();
                 break;
@@ -103,7 +103,7 @@ public class Data {
         System.out.println("Input number of week: ");
         this.numOfWeeks = sc.nextInt();
 
-        //Convert to days
+        // Convert to days
         this.numOfDays = this.numOfWeeks * 7;
         this.endDate = startDate.plusDays(this.numOfDays);
         arrayOfTime();
@@ -116,7 +116,7 @@ public class Data {
         System.out.println("Input number of week: ");
         this.numOfWeeks = sc.nextInt();
 
-        //Convert to days
+        // Convert to days
         this.numOfDays = this.numOfWeeks * 7;
         this.startDate = this.endDate.minusDays(this.numOfDays);
         arrayOfTime();
@@ -168,21 +168,95 @@ public class Data {
         inputEnd();
         System.out.println("Enter your days will stay: ");
         this.numOfDays = sc.nextInt();
-        //Count
+        // Count
         this.startDate = this.endDate.minusDays(this.numOfDays);
         arrayOfTime();
         return this.arrayOfTime();
     }
 
-    public void dayInput(){
+    public void dayInput() {
         String s = sc.nextLine();
-        if (s.contains("/")){
-            this.newString = s;
-        }
-        else {
-            String s1[] = s.split("-");
-            for (int i =0; i < s1.length; i++){
+
+        if (s.contains("/")) {
+            this.s1 = s.split("/");
+            int month = Integer.parseInt(this.s1[0]);
+            int day = Integer.parseInt(this.s1[1]);
+            int year = Integer.parseInt(this.s1[2]);
+            System.out.println(month);
+            System.out.println(day);
+            System.out.println(year);
+
+            if (month == 2 && day == 29 && year == 2020) {
+            } else {
+                System.out.println("""
+                        Your input is invalid.
+                        There is no 2/29 in 2021.
+                        Only year 2020 and 2021 is valid to input.
+                        Please input again.
+                        """);
+                dayInput();
+            }
+
+            if (month < 1 || month > 12) {
+                System.out.println("Your month input is invalid");
+                dayInput();
+            }
+
+            if (day < 1 || day > 31) {
+                System.out.println("Your day input is invalid");
+                dayInput();
+            }
+
+            if (year != 2020 && year != 2021) {
+                System.out.println("Your year input is invalid");
+                dayInput();
+            }
+            
+            for (int i = 0; i < s1.length; i++) {
                 this.newString = String.join("/", s1[0], s1[1], s1[2]);
+            }
+        } else {
+            this.s1 = s.split("-");
+            int month = Integer.parseInt(this.s1[0]);
+            int day = Integer.parseInt(this.s1[1]);
+            int year = Integer.parseInt(this.s1[2]);
+
+            try {
+                month = Integer.parseInt(this.s1[0]);
+                day = Integer.parseInt(this.s1[1]);
+                year = Integer.parseInt(this.s1[2]);
+            } catch (NumberFormatException e) {
+                System.out.println("Your input must be Month Day Year as format (mm/dd/yyyy).");
+                dayInput();
+            }
+
+            if (month == 2 && day == 29 && year != 2020) {
+                System.out.println("""
+                        Your input is invalid.
+                        There is no 2/29 in 2021.
+                        Only year 2020 and 2021 is valid to input.
+                        Please input again.
+                        """);
+                dayInput();
+            }
+
+            if (month < 1 || day > 12) {
+                System.out.println("Your month input is invalid");
+                dayInput();
+            }
+
+            if (day < 1 || day > 31) {
+                System.out.println("Your day input is invalid");
+                dayInput();
+            }
+
+            if (year != 2020 || year != 2021) {
+                System.out.println("Your year input is invalid");
+                dayInput();
+            }
+            
+            for (int i = 0; i < s1.length; i++) {
+                this.newString = s;
             }
         }
     }
