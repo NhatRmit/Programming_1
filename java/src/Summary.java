@@ -5,11 +5,11 @@ import java.util.regex.*;
 public class Summary {
     // Attribute
     int num_of_group, daysInput;
-    String path = "java/src/covid-data.csv";
+    String path = "src/covid-data.csv";
     String line = "";
     String userMetricChoice = "";
     String resultType = "";
-    int opt = 0;
+    String opt;
     Scanner sc = new Scanner(System.in);
     // Data Fetched and Filtered by Area
     ArrayList<String> list = new ArrayList<>();
@@ -69,33 +69,30 @@ public class Summary {
         }
 
         // filter data by area user inputs
-        if (user.chooseAreaInput == 1) {
+        if (user.chooseAreaInput.equals("1")) {
             for (String e : this.list) {
-                if (isContain(e, user.area) == true) {
+                if (isContained(e, user.area)) {
                     this.listByArea.add(e);
                 }
             }
         } else {
             for (String e : this.list) {
-                if (isContain(e, user.area) && ((isContain(e, "owid_asi")) ||
+                if (isContained(e, user.area) && ((isContained(e, "owid_asi")) ||
 
-                        (isContain(e, "owid_eur")) ||
+                        (isContained(e, "owid_eur")) ||
 
-                        (isContain(e, "owid_afr")) ||
+                        (isContained(e, "owid_afr")) ||
 
-                        (isContain(e, "owid_oce")) ||
+                        (isContained(e, "owid_oce")) ||
 
-                        (isContain(e, "owid_nam")) ||
+                        (isContained(e, "owid_nam")) ||
 
-                        (isContain(e, "owid_eun")) ||
+                        (isContained(e, "owid_eun")) ||
 
-                        (isContain(e, "owid_sam"))
+                        (isContained(e, "owid_sam")) ||
 
+                        (isContained(e, "owid_wrl"))
                 )) {
-                    this.listByArea.add(e);
-                }
-
-                if (isContain(e, user.area) && isContain(e, "owid")) {
                     this.listByArea.add(e);
                 }
             }
@@ -103,7 +100,7 @@ public class Summary {
 
         // filter data from beginning of the area to the start date user inputs
         for (String e : this.listByArea) {
-            if (isContain(e, user.timerange[0]) != true) {
+            if (isContained(e, user.timerange[0]) != true) {
                 this.listFromBeginToStartDate.add(e);
             } else {
                 break;
@@ -113,7 +110,7 @@ public class Summary {
         // get data by area and time range that user inputs
         for (String e : this.listByArea) {
             for (int i = 0; i < user.timerange.length; i++) {
-                if (isContain(e, user.timerange[i]) == true) {
+                if (isContained(e, user.timerange[i]) == true) {
                     this.listUserRangeTime.add(e);
                 }
             }
@@ -162,7 +159,8 @@ public class Summary {
     }
 
     public void numOfDays() {
-        this.num_of_group = listUserRangeTime.size() / this.daysInput; // N.O groups in case % == 0
+        // N.O groups in case % == 0
+        this.num_of_group = listUserRangeTime.size() / this.daysInput;
         // Check
         this.dataList = createDataList(this.dataList, this.num_of_group);
         this.dataTime = createDataList(this.dataTime, this.num_of_group);
@@ -185,14 +183,14 @@ public class Summary {
                 1. No Grouping
                 2. Number of Groups
                 3. Number of Days in a group""");
-        this.opt = sc.nextInt();
+        this.opt = sc.nextLine();
         boolean check = true;
         switch (opt) {
-            case 1:
+            case "1":
                 // Nogrouping Option
                 inputMetric(opt);
                 break;
-            case 2:
+            case "2":
                 // Number of groups Option
                 System.out.println("Please choose number of group that you want: ");
                 this.num_of_group = sc.nextInt();
@@ -210,7 +208,7 @@ public class Summary {
                 }
                 inputMetric(opt);
                 break;
-            case 3:
+            case "3":
                 // Number of days in a group
                 System.out.println("Enter your number of days: ");
                 this.daysInput = sc.nextInt();
@@ -234,25 +232,25 @@ public class Summary {
     }
 
     // Let Users choose their metric
-    public void inputMetric(int num) {
+    public void inputMetric(String num) {
         System.out.println("""
                 Select the information you want to see:
                 1. New Cases
                 2. New Deaths
                 3. People Vaccinated""");
-        int opt = sc.nextInt();
+        String opt = sc.nextLine();
         switch (opt) {
-            case 1:
+            case "1":
                 // Metric is new covid cases
                 this.userMetricChoice = "cases";
                 runMetric(num);
                 break;
-            case 2:
+            case "2":
                 // Metric is people deaths
                 this.userMetricChoice = "deaths";
                 runMetric(num);
                 break;
-            case 3:
+            case "3":
                 // Metric is people who got vaccinated
                 this.userMetricChoice = "vaccinations";
                 runMetric(num);
@@ -268,7 +266,7 @@ public class Summary {
     // runMetric function will proccess to get exact metric data and then group
     // users data as their choices and
     // choose result type
-    public void runMetric(int num) {
+    public void runMetric(String num) {
         // Get Metric Data from beginning of the area to start date in order to
         // calculate the upTo function
         getMetricDataAndTimeRange(this.listFromBeginToStartDate, this.listByAreaMetricBeforeStartDate,
@@ -276,18 +274,18 @@ public class Summary {
         // Get Metric Data and Time Range Data as user choice
         getMetricDataAndTimeRange(this.listUserRangeTime, this.listUserMetric, this.listUserTimeRange);
         switch (num) {
-            case 1:
+            case "1":
                 // Run no grouping and run function to choose result type to calculate
                 noGrouping();
                 chooseResultType();
                 break;
-            case 2:
+            case "2":
                 // Run number of groups grouping and run function to choose result type to
                 // calculate
                 numOfGroups();
                 chooseResultType();
                 break;
-            case 3:
+            case "3":
                 // Run number of days in a group grouping and run function to choose result type
                 // to calculate
                 numOfDays();
@@ -433,7 +431,7 @@ public class Summary {
     }
 
     public void getMetricDataAndTimeRange(ArrayList<String> list, ArrayList<String> metric,
-            ArrayList<String> rangetime) {
+                                          ArrayList<String> rangetime) {
         // convert list to array
         String[] value;
         String[] userListConvert = new String[list.size()];
@@ -463,15 +461,15 @@ public class Summary {
     public List<List<String>> createDataList(List<List<String>> list, int num_of_group) {
         list = new ArrayList<>();
         for (int i = 1; i <= num_of_group; i++) {
-            List<String> tempList = new ArrayList<>();
-            list.add(tempList);
+            List<String> eachGroupList = new ArrayList<>();
+            list.add(eachGroupList);
         }
         return list;
     }
 
-    public boolean isContain(String s, String item) {
-        String p = "\\b" + item + "\\b";
-        Pattern pattern = Pattern.compile(p);
+    public boolean isContained(String s, String str) {
+        String check = "\\b" + str + "\\b";
+        Pattern pattern = Pattern.compile(check);
         Matcher matcher = pattern.matcher(s);
         return matcher.find();
     }
@@ -504,13 +502,13 @@ public class Summary {
     public void convertGroupTimeToArray() {
         String groupFirstDate = "";
         String groupLastDate = "";
-        if (this.opt == 1) {
+        if (this.opt.equals("1")) {
             for (int i = 0; i < this.dataTime.size(); i++) {
                 groupFirstDate = this.dataTime.get(i).get(0);
                 this.dataTimeString.add(groupFirstDate);
             }
         } else {
-            if(this.num_of_group == listUserRangeTime.size()){
+            if (this.num_of_group == listUserRangeTime.size()) {
                 for (int i = 0; i < this.dataTime.size(); i++) {
                     groupFirstDate = this.dataTime.get(i).get(0);
                     this.dataTimeString.add(groupFirstDate);
