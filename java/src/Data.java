@@ -186,20 +186,22 @@ public class Data {
             System.out.println(day);
             System.out.println(year);
 
-            if (month == 2 && day == 29 && year == 2020) {
-            } else {
-                System.out.println("""
-                        Your input is invalid.
-                        There is no 2/29 in 2021.
-                        Only year 2020 and 2021 is valid to input.
-                        Please input again.
-                        """);
-                dayInput();
-            }
-
             if (month < 1 || month > 12) {
                 System.out.println("Your month input is invalid");
                 dayInput();
+            }
+
+            if (month == 2) {
+                if (day == 29 && year == 2020) {
+                } else {
+                    System.out.println("""
+                            Your input is invalid.
+                            There is no 2/29 in 2021.
+                            Only year 2020 and 2021 is valid to input.
+                            Please input again.
+                            """);
+                    dayInput();
+                }
             }
 
             if (day < 1 || day > 31) {
@@ -211,7 +213,7 @@ public class Data {
                 System.out.println("Your year input is invalid");
                 dayInput();
             }
-            
+
             for (int i = 0; i < s1.length; i++) {
                 this.newString = String.join("/", s1[0], s1[1], s1[2]);
             }
@@ -230,19 +232,22 @@ public class Data {
                 dayInput();
             }
 
-            if (month == 2 && day == 29 && year != 2020) {
-                System.out.println("""
-                        Your input is invalid.
-                        There is no 2/29 in 2021.
-                        Only year 2020 and 2021 is valid to input.
-                        Please input again.
-                        """);
-                dayInput();
-            }
-
             if (month < 1 || day > 12) {
                 System.out.println("Your month input is invalid");
                 dayInput();
+            }
+
+            if (month == 2) {
+                if (day == 29 && year == 2020) {
+                } else {
+                    System.out.println("""
+                            Your input is invalid.
+                            There is no 2/29 in 2021.
+                            Only year 2020 and 2021 is valid to input.
+                            Please input again.
+                            """);
+                    dayInput();
+                }
             }
 
             if (day < 1 || day > 31) {
@@ -254,7 +259,7 @@ public class Data {
                 System.out.println("Your year input is invalid");
                 dayInput();
             }
-            
+
             for (int i = 0; i < s1.length; i++) {
                 this.newString = s;
             }
