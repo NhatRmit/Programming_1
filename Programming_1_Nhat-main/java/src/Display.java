@@ -6,6 +6,7 @@ public class Display {
     Summary s = new Summary();
     Scanner sc = new Scanner(System.in);
 
+    // Function to choose type of display
     public void displayType() throws Exception {
         s.sumData();
         String opt;
@@ -28,6 +29,7 @@ public class Display {
         }
     }
 
+    //Display Tabular chart
     public void displayTabular() throws Exception {
         boolean rowJustifyLeft = true;
         int tableMaxWidth = 30;
@@ -142,7 +144,7 @@ public class Display {
     }
 
 
-
+    //Display Textual chart
     public void displayChart() throws FileNotFoundException, Exception {
         int rows = 24;
         int columns = 80;

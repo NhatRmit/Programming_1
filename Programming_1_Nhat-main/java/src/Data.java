@@ -58,6 +58,7 @@ public class Data {
         return date;
     }
 
+    // Users choose time range types
     public void timeRangeType() {
         String opt, sub_opt;
 
@@ -107,6 +108,7 @@ public class Data {
         }
     }
 
+    // Function to get week input for "Number of days or weeks from a particular date" type
     public String[] getWeekFrom() {
         inputStart();
         System.out.println("Enter the number of weeks from your start date (Start Date inclusive): ");
@@ -119,6 +121,7 @@ public class Data {
         return this.arrayOfTime();
     }
 
+    // Function to get week input for "Number of days or weeks to a particular date" type
     public String[] getWeekTo() {
         inputEnd();
         System.out.println("Enter the number of weeks before your end date (End Date inclusive): ");
@@ -131,6 +134,7 @@ public class Data {
         return this.arrayOfTime();
     }
 
+    //
     public void inputStart() {
         System.out.println("Input start day (MM-DD-YYYY): ");
         dayInput();
@@ -155,6 +159,7 @@ public class Data {
         return this.timerange;
     }
 
+    //Return a Pair of user's input time
     public String[] getPair() {
         inputStart();
         inputEnd();
@@ -162,6 +167,7 @@ public class Data {
         return this.arrayOfTime();
     }
 
+    //Function to get week input for "Number of days or weeks to a particular date" type
     public String[] getDaysFrom() {
         inputStart();
         System.out.println("Enter the number of days from your start date (Start Date inclusive): ");
@@ -173,6 +179,7 @@ public class Data {
         return this.arrayOfTime();
     }
 
+    //Function to get days input for "Number of days or weeks to a particular date" type
     public String[] getDaysTo() {
         inputEnd();
         System.out.println("Enter the number of days before your end date (End Date inclusive): ");
@@ -184,6 +191,7 @@ public class Data {
         return this.arrayOfTime();
     }
 
+    // Function for Date Validatio
     public void checkDate(int month, int day, int year) {
         if (month < 1 || month > 12) {
             System.out.println("Your month input is invalid");
@@ -217,6 +225,7 @@ public class Data {
 
     }
 
+    //Function to check user date input in 2 format: M/d/YYYY and M-d-YYYY.
     public void dayInput() {
         String s = sc.nextLine();
 
